@@ -19,7 +19,7 @@ if 'zusammenfassung_angezeigt' not in st.session_state:
     st.session_state.zusammenfassung_angezeigt = False
 
 # Logo anzeigen (zentriert)
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.markdown("""
     <div style="text-align: center; margin-bottom: 20px;">
@@ -273,13 +273,15 @@ if st.session_state.eingaben_bestaetigt:
     st.components.v1.html(sketchfab_html, height=650)
     
     # Zusätzliche Informationen zum Modell
-    st.info("""
-    🎯 **Bedienung des 3D-Modells:**
-    - **Drehen**: Linke Maustaste gedrückt halten und bewegen
-    - **Zoomen**: Mausrad oder Pinch-Geste auf Touchscreens
-    - **Verschieben**: Rechte Maustaste gedrückt halten und bewegen
-    - **Automatische Rotation**: Das Modell dreht sich automatisch
-    - **Vollbild**: Klicken Sie auf das Vollbild-Symbol im 3D-Viewer    """)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.info("""
+        🎯 **Bedienung des 3D-Modells:**
+        - **Drehen**: Linke Maustaste gedrückt halten und bewegen
+        - **Zoomen**: Mausrad oder Pinch-Geste auf Touchscreens
+        - **Verschieben**: Rechte Maustaste gedrückt halten und bewegen
+        - **Automatische Rotation**: Das Modell dreht sich automatisch
+        - **Vollbild**: Klicken Sie auf das Vollbild-Symbol im 3D-Viewer    """)
     
     # Buttons für Aktionen
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
@@ -295,7 +297,7 @@ if st.session_state.eingaben_bestaetigt:
             💡 Ein schneller und unkomplizierter Weg zu ihrem Eigenheim
             """)
     
-    with col3:
+    with col2:
         if st.button("🔄 Neue Eingaben machen", key="reset"):
             st.session_state.eingaben_bestaetigt = False
             st.session_state.zusammenfassung_angezeigt = False

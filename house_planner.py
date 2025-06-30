@@ -5,6 +5,32 @@ import requests
 from geopy.geocoders import Nominatim
 import time
 
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def geocode_address(address):
+    """
+    Geocode an address and return location data.
+    Cached to avoid repeated API calls for the same address.
+    """
+    try:
+        geolocator = Nominatim(
+            user_agent="house_planner_v1.0",
+            timeout=10
+        )
+        location = geolocator.geocode(address)
+        
+        if location:
+            return {
+                "latitude": location.latitude,
+                "longitude": location.longitude,
+                "address": location.address,
+                "found": True
+            }
+        else:
+            return {"found": False}
+            
+    except Exception as e:
+        return {"found": False, "error": str(e)}
+
 # Seitenkonfiguration
 st.set_page_config(
     page_title="Hausplaner - Grundstück & Präferenzen",
@@ -70,45 +96,37 @@ if adresse:
     
     col1, col2, col3 = st.columns([1, 1, 2])
     with col2:
-        try:
-            # Geocoding der Adresse mit längerem Timeout
-            geolocator = Nominatim(
-                user_agent="house_planner_v1.0",
-                timeout=10  # 10 Sekunden Timeout statt Standard 1 Sekunde
+        # Use cached geocoding function
+        with st.spinner("🔍 Suche Adresse..."):
+            location_data = geocode_address(adresse)
+        
+        if location_data["found"]:
+            # Karte erstellen
+            m = folium.Map(
+                location=[location_data["latitude"], location_data["longitude"]],
+                zoom_start=15,
+                width=700,
+                height=400
             )
             
-            # Lade-Indikator anzeigen
-            with st.spinner("🔍 Suche Adresse..."):
-                location = geolocator.geocode(adresse)
+            # Marker für das Grundstück hinzufügen
+            folium.Marker(
+                [location_data["latitude"], location_data["longitude"]],
+                popup=f"Grundstück: {adresse}",
+                tooltip="Ihr Grundstück",
+                icon=folium.Icon(color='red', icon='home')
+            ).add_to(m)
             
-            if location:
-                # Karte erstellen
-                m = folium.Map(
-                    location=[location.latitude, location.longitude],
-                    zoom_start=15,
-                    width=700,
-                    height=400
-                )
-                
-                # Marker für das Grundstück hinzufügen
-                folium.Marker(
-                    [location.latitude, location.longitude],
-                    popup=f"Grundstück: {adresse}",
-                    tooltip="Ihr Grundstück",
-                    icon=folium.Icon(color='red', icon='home')
-                ).add_to(m)
-                
-                # Karte anzeigen
-                st_folium(m, width=700, height=400)
-                
-                # Zusätzliche Informationen
-                st.info(f"📍 Koordinaten: {location.latitude:.6f}, {location.longitude:.6f}")
-                
-            else:
-                st.warning("⚠️ Adresse konnte nicht gefunden werden. Bitte überprüfen Sie die Eingabe.")
-                
-        except Exception as e:
-            st.error(f"❌ Fehler beim Laden der Karte: {str(e)}")
+            # Karte anzeigen
+            st_folium(m, width=700, height=400)
+            
+            # Zusätzliche Informationen
+            st.info(f"📍 Koordinaten: {location_data['latitude']:.6f}, {location_data['longitude']:.6f}")
+            
+        elif "error" in location_data:
+            st.error(f"❌ Fehler beim Laden der Karte: {location_data['error']}")
+        else:
+            st.warning("⚠️ Adresse konnte nicht gefunden werden. Bitte überprüfen Sie die Eingabe.")
 
 st.markdown("---")
 

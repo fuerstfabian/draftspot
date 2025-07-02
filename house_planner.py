@@ -332,7 +332,7 @@ Diese App hilft Ihnen dabei, Ihre Präferenzen für Ihr Traumhaus zu erfassen un
 - 📍 Grundstücksdaten erfassen
 - 🗺️ Lage auf der Karte anzeigen
 - 📝 Präferenzen bewerten
-- 📋 Zusammenfassung erstellen
+- 📋 Zusammenfassung der Arbeitspakete erstellen
 - 🏠 3D-Hausmodell generieren
 
 **3D-Modell:**
